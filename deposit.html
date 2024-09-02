@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Details and Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #FFD700;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .bank-detail {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            width: 48%;
+        }
+
+        .form-container {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #FFD700;
+            border-radius: 5px;
+            background-color: #333;
+            color: #FFD700;
+        }
+
+        button {
+            background-color: #FFD700;
+            color: #000;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e6c200;
+        }
+
+        .info-container {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .info-item {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-item img {
+            max-width: 150px;
+            height: auto;
+            border: 1px solid #FFD700;
+            border-radius: 5px;
+        }
+
+        .delete-btn {
+            background-color: #FF4500;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #e63e00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bank-detail" id="bank-detail-1">
+            <h2>Bank Detail 1</h2>
+            <p>Account Number: 123456789</p>
+            <p>Bank: Example Bank</p>
+            <p>Account Name: John Doe</p>
+        </div>
+        <div class="bank-detail" id="bank-detail-2">
+            <h2>Bank Detail 2</h2>
+            <p>Account Number: 987654321</p>
+            <p>Bank: Another Bank</p>
+            <p>Account Name: Jane Smith</p>
+        </div>
+    </div>
+    <div class="form-container">
+        <form id="data-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required><br><br>
+            <label for="date">Date:</label>
+            <input type="date" id="date" required><br><br>
+            <label for="account-detail">Account Detail:</label>
+            <input type="text" id="account-detail" required><br><br>
+            <label for="receipt">Upload Receipt:</label>
+            <input type="file" id="receipt" accept="image/*" required><br><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div class="info-container" id="info-container">
+        <h3>Submitted Information</h3>
+        <!-- Submitted information will appear here -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("data-form");
+            const infoContainer = document.getElementById("info-container");
+
+            // Load stored data
+            loadStoredData();
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const name = document.getElementById("name").value;
+                const date = document.getElementById("date").value;
+                const accountDetail = document.getElementById("account-detail").value;
+                const receipt = document.getElementById("receipt").files[0];
+
+                // Create a FileReader to read the receipt as a data URL
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const receiptDataURL = event.target.result;
+                    
+                    const info = {
+                        name,
+                        date,
+                        accountDetail,
+                        receiptDataURL,
+                    };
+
+                    addInfoItem(info);
+                    storeData(info);
+                    form.reset();
+                };
+                
+                reader.readAsDataURL(receipt);
+            });
+
+            function addInfoItem(info) {
+                const infoItem = document.createElement("div");
+                infoItem.classList.add("info-item");
+
+                infoItem.innerHTML = `
+                    <div>
+                        <p>Name: ${info.name}</p>
+                        <p>Date: ${info.date}</p>
+                        <p>Account Detail: ${info.accountDetail}</p>
+                        <img src="${info.receiptDataURL}" alt="Receipt Preview">
+                    </div>
+                    <button class="delete-btn">Delete</button>
+                `;
+
+                infoContainer.appendChild(infoItem);
+
+                const deleteBtn = infoItem.querySelector(".delete-btn");
+                deleteBtn.addEventListener("click", function () {
+                    infoContainer.removeChild(infoItem);
+                    removeStoredData(info);
+                });
+            }
+
+            function storeData(info) {
+                let storedData = JSON.parse(localStorage.getItem("submittedInfo")) || [];
+                storedData.push(info);
+                localStorage.setItem("submittedInfo", JSON.stringify(storedData));
+            }
+
+            function loadStoredData() {
+                let storedData = JSON.parse(localStorage.getItem("submittedInfo")) || [];
+                storedData.forEach((info) => addInfoItem(info));
+            }
+
+            function removeStoredData(infoToRemove) {
+                let storedData = JSON.parse(localStorage.getItem("submittedInfo")) || [];
+                storedData = storedData.filter(
+                    (info) =>
+                        info.name !== infoToRemove.name ||
+                        info.date !== infoToRemove.date ||
+                        info.accountDetail !== infoToRemove.accountDetail ||
+                        info.receiptDataURL !== infoToRemove.receiptDataURL
+                );
+                localStorage.setItem("submittedInfo", JSON.stringify(storedData));
+            }
+        });
+    </script>
+</body>
+</html>

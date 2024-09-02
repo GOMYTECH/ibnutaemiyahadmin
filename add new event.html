@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #FFD700;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            background-color: #222;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #FFD700;
+            border-radius: 3px;
+            background-color: #333;
+            color: #FFD700;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #FFD700;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #000;
+        }
+        .event-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .event-item {
+            background-color: #333;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #FFD700;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .delete-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Event Manager</h1>
+
+    <form id="eventForm">
+        <input type="text" id="eventName" placeholder="Event Name" required>
+        <input type="date" id="eventDate" required>
+        <textarea id="eventDescription" placeholder="Event Description" rows="4" required></textarea>
+        <input type="number" id="eventDuration" placeholder="Duration (hours)" required>
+        <button type="submit">Add Event</button>
+    </form>
+
+    <ul class="event-list" id="eventList"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventForm = document.getElementById('eventForm');
+            const eventList = document.getElementById('eventList');
+
+            function renderEvent(event) {
+                const li = document.createElement('li');
+                li.className = 'event-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${event.name}</strong><br>
+                        Date: ${event.date}<br>
+                        Description: ${event.description}<br>
+                        Duration: ${event.duration} hours
+                    </div>
+                    <button class="delete-button">Delete</button>
+                `;
+                li.querySelector('.delete-button').addEventListener('click', function() {
+                    eventList.removeChild(li);
+                    deleteEvent(event);
+                });
+                eventList.appendChild(li);
+            }
+
+            function getEvents() {
+                return JSON.parse(localStorage.getItem('events')) || [];
+            }
+
+            function saveEvent(event) {
+                const events = getEvents();
+                events.push(event);
+                localStorage.setItem('events', JSON.stringify(events));
+            }
+
+            function deleteEvent(event) {
+                const events = getEvents().filter(e => e.name !== event.name || e.date !== event.date);
+                localStorage.setItem('events', JSON.stringify(events));
+            }
+
+            function renderEvents() {
+                eventList.innerHTML = '';
+                const events = getEvents();
+                events.forEach(event => renderEvent(event));
+            }
+
+            eventForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const newEvent = {
+                    name: document.getElementById('eventName').value,
+                    date: document.getElementById('eventDate').value,
+                    description: document.getElementById('eventDescription').value,
+                    duration: document.getElementById('eventDuration').value
+                };
+                saveEvent(newEvent);
+                renderEvent(newEvent);
+                eventForm.reset();
+            });
+
+            renderEvents();
+        });
+    </script>
+
+</body>
+</html>

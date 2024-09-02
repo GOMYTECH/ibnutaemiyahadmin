@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 20px;
+        }
+
+        .container {
+            background-color: #333;
+            border: 2px solid #ffcc00;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #ffcc00;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffcc00;
+        }
+
+        input, select, button {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #ffcc00;
+            background-color: #000;
+            color: #ffcc00;
+        }
+
+        input:focus, select:focus, button:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        button {
+            background-color: #ffcc00;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .entry {
+            background-color: #444;
+            border: 1px solid #ffcc00;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .entry p {
+            margin: 5px 0;
+        }
+
+        .delete-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background-color: red;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .delete-button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Message Form</h2>
+        <form id="messageForm">
+            <div class="form-group">
+                <label for="message">Message:</label>
+                <input type="text" id="message" name="message" required>
+            </div>
+            <div class="form-group">
+                <label for="option">Option:</label>
+                <select id="option" name="option">
+                    <option value="Mission">Mission</option>
+                    <option value="Party">Party</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="duration">Duration:</label>
+                <input type="number" id="duration" name="duration" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div id="entriesContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('messageForm');
+            const entriesContainer = document.getElementById('entriesContainer');
+            let entries = JSON.parse(localStorage.getItem('entries')) || [];
+
+            function renderEntries() {
+                entriesContainer.innerHTML = '';
+                entries.forEach((entry, index) => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.classList.add('entry');
+                    entryDiv.innerHTML = `
+                        <p><strong>Message:</strong> ${entry.message} <button class="delete-button" data-index="${index}" data-field="message">Delete Message</button></p>
+                        <p><strong>Option:</strong> ${entry.option} <button class="delete-button" data-index="${index}" data-field="option">Delete Option</button></p>
+                        <p><strong>Duration:</strong> ${entry.duration} days <button class="delete-button" data-index="${index}" data-field="duration">Delete Duration</button></p>
+                    `;
+                    entriesContainer.appendChild(entryDiv);
+                });
+            }
+
+            function saveEntries() {
+                localStorage.setItem('entries', JSON.stringify(entries));
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const message = document.getElementById('message').value;
+                const option = document.getElementById('option').value;
+                const duration = document.getElementById('duration').value;
+
+                entries.push({ message, option, duration });
+                saveEntries();
+                renderEntries();
+                form.reset();
+            });
+
+            entriesContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('delete-button')) {
+                    const index = event.target.getAttribute('data-index');
+                    const field = event.target.getAttribute('data-field');
+                    deleteField(index, field);
+                }
+            });
+
+            function deleteField(index, field) {
+                if (field === 'message') {
+                    entries[index].message = '';
+                } else if (field === 'option') {
+                    entries[index].option = '';
+                } else if (field === 'duration') {
+                    entries[index].duration = '';
+                }
+                if (!entries[index].message && !entries[index].option && !entries[index].duration) {
+                    entries.splice(index, 1);
+                }
+                saveEntries();
+                renderEntries();
+            }
+
+            renderEntries();
+        });
+    </script>
+
+</body>
+</html>
+

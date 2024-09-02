@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Information Form</title>
+    <style>
+        body {
+            background-color: black;
+            color: yellow;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #222;
+            border-radius: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid yellow;
+            border-radius: 5px;
+            background-color: #333;
+            color: yellow;
+        }
+        button {
+            background-color: yellow;
+            color: black;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #FFD700;
+        }
+        .entry {
+            background-color: #333;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Account Information</h1>
+        <form id="accountForm">
+            <label for="accountName">Account Name</label>
+            <input type="text" id="accountName" required>
+
+            <label for="bankAccount">Bank Account</label>
+            <input type="text" id="bankAccount" required>
+
+            <label for="accountNumber">Account Number</label>
+            <input type="text" id="accountNumber" required>
+
+            <label for="bank">Bank</label>
+            <select id="bank" required>
+                <option value="Bank 1">Bank 1</option>
+                <option value="Bank 2">Bank 2</option>
+            </select>
+
+            <button type="submit">Add Account</button>
+        </form>
+
+        <div id="accountEntries"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const accountForm = document.getElementById('accountForm');
+            const accountEntries = document.getElementById('accountEntries');
+
+            // Load existing entries from localStorage
+            const savedEntries = JSON.parse(localStorage.getItem('accounts')) || [];
+            savedEntries.forEach(entry => addEntryToDOM(entry));
+
+            accountForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const accountName = document.getElementById('accountName').value;
+                const bankAccount = document.getElementById('bankAccount').value;
+                const accountNumber = document.getElementById('accountNumber').value;
+                const bank = document.getElementById('bank').value;
+
+                const entry = {
+                    accountName,
+                    bankAccount,
+                    accountNumber,
+                    bank
+                };
+
+                addEntryToDOM(entry);
+                saveEntry(entry);
+
+                accountForm.reset();
+            });
+
+            function addEntryToDOM(entry) {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'entry';
+                entryDiv.innerHTML = `
+                    <p><strong>Account Name:</strong> ${entry.accountName}</p>
+                    <p><strong>Bank Account:</strong> ${entry.bankAccount}</p>
+                    <p><strong>Account Number:</strong> ${entry.accountNumber}</p>
+                    <p><strong>Bank:</strong> ${entry.bank}</p>
+                    <button onclick="deleteEntry(this)">Delete</button>
+                `;
+                accountEntries.appendChild(entryDiv);
+            }
+
+            function saveEntry(entry) {
+                const entries = JSON.parse(localStorage.getItem('accounts')) || [];
+                entries.push(entry);
+                localStorage.setItem('accounts', JSON.stringify(entries));
+            }
+
+            deleteEntry = (button) => {
+                const entryDiv = button.parentElement;
+                const index = Array.from(accountEntries.children).indexOf(entryDiv);
+                let entries = JSON.parse(localStorage.getItem('accounts'));
+                entries.splice(index, 1);
+                localStorage.setItem('accounts', JSON.stringify(entries));
+                entryDiv.remove();
+            };
+        });
+    </script>
+
+</body>
+</html>
