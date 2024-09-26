@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submitted Information</title>
+    <style>
+        body {
+            background-color: black;
+            color: yellow;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background-color: yellow;
+            color: black;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            background-color: black;
+            color: yellow;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        button:hover {
+            background-color: yellow;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Submitted Information</h1>
+        <div id="student-info-board">
+            <!-- Student info will be shown here -->
+        </div>
+    
+    </div>
+
+    <script>
+        const studentInfoBoard = document.getElementById('student-info-board');
+
+        // Retrieve submissions from local storage
+        const submissions = JSON.parse(localStorage.getItem('submissions')) || [];
+
+        // Populate the board with submission data
+        submissions.forEach(info => {
+            const studentInfoItem = document.createElement('div');
+            studentInfoItem.classList.add('info-item');
+
+            studentInfoItem.innerHTML = `
+                <span><strong>${info.studentName}</strong> - Exam No: ${info.examNo}, Sex: ${info.sex}, Parent's No: ${info.parentNumber}, Email: ${info.email}, Submitted at: ${info.timestamp}</span>
+                <button onclick="sendMail('${info.email}')">Mail</button>
+            `;
+
+            // Add the new entry to the board
+            studentInfoBoard.appendChild(studentInfoItem);
+        });
+
+        // Function to handle mailing
+        function sendMail(email) {
+            window.location.href = `mailto:${email}`;
+        }
+    </script>
+</body>
+</html>

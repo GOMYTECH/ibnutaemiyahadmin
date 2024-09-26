@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Account Information</title>
+    <style>
+        body {
+            background-color: black;
+            color: yellow;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 300px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background-color: yellow;
+            color: black;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Account Information</h1>
+    <input type="text" id="accountNumber" placeholder="Account Number">
+    <input type="text" id="accountName" placeholder="Account Name">
+    <input type="text" id="bankName" placeholder="Bank Name">
+    <button onclick="saveAccountInfo()">Save</button>
+
+    <p>
+        <a href="payment_page.html">Back to Payment Page</a>
+    </p>
+
+    <script>
+        // Load current account information into inputs
+        function loadAccountInfo() {
+            document.getElementById('accountNumber').value = localStorage.getItem('accountNumber') || '';
+            document.getElementById('accountName').value = localStorage.getItem('accountName') || '';
+            document.getElementById('bankName').value = localStorage.getItem('bankName') || '';
+        }
+
+        function saveAccountInfo() {
+            const accountNumber = document.getElementById('accountNumber').value;
+            const accountName = document.getElementById('accountName').value;
+            const bankName = document.getElementById('bankName').value;
+
+            localStorage.setItem('accountNumber', accountNumber);
+            localStorage.setItem('accountName', accountName);
+            localStorage.setItem('bankName', bankName);
+
+            alert("Account information saved!");
+        }
+
+        // Load account info on page load
+        loadAccountInfo();
+    </script>
+</body>
+</html>
